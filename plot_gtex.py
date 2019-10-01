@@ -8,6 +8,7 @@ import matplotlib.pylab as plt
 
 
 def linear_search(key, L):
+    """does a linear search"""
     hit = -1
     for i in range(len(L)):
         curr = L[i]
@@ -17,6 +18,7 @@ def linear_search(key, L):
 
 
 def binary_search(key, D):
+    """does a binary search"""
     lo = -1
     hi = len(D)
     while (hi - lo > 1):
@@ -34,6 +36,7 @@ def binary_search(key, D):
 
 
 def main():
+    """main function"""
     data_file_name = args.gzfile
     sample_info_file_name = args.txtfile
     group_col_name = args.group_type
