@@ -3,6 +3,8 @@ import plot_gtex
 import string
 import random
 import numpy as np
+import argparse
+from os import path
 
 
 class TestPlotGtex(unittest.TestCase):
@@ -60,3 +62,5 @@ class TestPlotGtex(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    if path.exists("./ACTA2.png") is True:
+        os.remove('./ACTA2.png')
