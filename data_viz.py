@@ -1,7 +1,7 @@
 import math_lib
-import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 def boxplot(L, nameset, group_col_name, gene_name, out_file_name):
