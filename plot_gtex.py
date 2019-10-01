@@ -7,20 +7,14 @@ matplotlib.use('Agg')
 import matplotlib.pylab as plt
 
 
-import gzip
-import sys
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pylab as plt
-
-
 def linear_search(key, L):
     hit = -1
-    for i  in range(len(L)):
-        curr =  L[i]
+    for i in range(len(L)):
+        curr = L[i]
         if key == curr:
             return i
     return -1
+
 
 def binary_search(key, D):
     lo = -1
@@ -31,12 +25,13 @@ def binary_search(key, D):
         if key == D[mid][0]:
             return D[mid][1]
 
-        if ( key < D[mid][0] ):
+        if (key < D[mid][0]):
             hi = mid
         else:
             lo = mid
 
     return -1
+
 
 def main():
     data_file_name = args.gzfile
@@ -46,11 +41,10 @@ def main():
 
     sample_id_col_name = 'SAMPID'
 
-
     samples = []
     sample_info_header = None
     for l in open(sample_info_file_name):
-        if sample_info_header == None:
+        if sample_info_header is None:
             sample_info_header = l.rstrip().split('\t')
         else:
             samples.append(l.rstrip().split('\t'))
@@ -76,28 +70,27 @@ def main():
             members.append([])
 
         members[curr_group_idx].append(sample_name)
-    
+
     nameset = list(dict.fromkeys(names).keys())
-    
+
     version = None
     dim = None
     data_header = None
 
     gene_name_col = 1
 
-
-    group_counts = [ [] for i in range(len(groups)) ]
+    group_counts = [[] for i in range(len(groups))]
 
     for l in gzip.open(data_file_name, 'rt'):
-        if version == None:
+        if version is None:
             version = l
             continue
 
-        if dim == None:
+        if dim is None:
             dim = [int(x) for x in l.rstrip().split()]
             continue
 
-        if data_header == None:
+        if data_header is None:
             data_header = []
             i = 0
             for field in l.rstrip().split('\t'):
@@ -115,9 +108,11 @@ def main():
                     member_idx = binary_search(member, data_header)
                     if member_idx != -1:
                         group_counts[group_idx].append(int(A[member_idx]))
-            break 
+            break
 
-    g = data_viz.boxplot(group_counts, nameset, group_col_name, gene_name, args.outfile)
+    g = data_viz.boxplot(
+        group_counts, nameset, group_col_name, gene_name, args.outfile)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Specify for gene dist")
