@@ -10,5 +10,10 @@ before_install:
     - conda activate test
     - conda install -y pycodestyle
     - conda install --yes python=3.6
+    - conda install --yes numpy
+    - conda install --matplotlib
       
 script:
+    - chmod +x test_plot_gtex.sh
+    - ./test_plot_gtex.sh
+    - python test_plot_gtex.py
