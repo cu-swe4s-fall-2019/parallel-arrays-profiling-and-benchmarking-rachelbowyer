@@ -14,7 +14,7 @@ before_install:
     - conda install --yes matplotlib
       
 script:
-    - git submodule update --init
+    - git submodule update --init --remote --recursive
     - chmod +x test_plot_gtex.sh
     - ./test_plot_gtex.sh
     - python test_plot_gtex.py
