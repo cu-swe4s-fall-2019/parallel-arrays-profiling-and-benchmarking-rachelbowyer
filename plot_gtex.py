@@ -9,6 +9,7 @@ sys.path.insert(1, "./hash-tables-rachelbowyer")
 import hash_tables as ht
 import hash_functions as hf
 import numpy as np
+import time
 
 
 def linear_search(key, L):
@@ -62,6 +63,9 @@ def main():
     members = []
 
     names = []
+    
+    MemTable = ht.ChainedHash(35,hf.h_rolling)
+    
     for row_idx in range(len(samples)):
         sample = samples[row_idx]
         sample_name = sample[sample_id_col_idx]
@@ -76,7 +80,8 @@ def main():
             members.append([])
 
         members[curr_group_idx].append(sample_name)
-
+        MemTable.add(curr_group, sample_name)
+    
     nameset = list(dict.fromkeys(names).keys())
 
     version = None
@@ -84,10 +89,10 @@ def main():
     data_header = None
 
     gene_name_col = 1
-
-    group_counts = [[] for i in range(len(groups))]
     
     Table1 = ht.ChainedHash(len(nameset),hf.h_rolling)
+    
+    group_counts = [[] for i in range(len(groups))]
     
     for l in gzip.open(data_file_name, 'rt'):
         if version is None:
@@ -112,138 +117,35 @@ def main():
 
         if A[gene_name_col] == gene_name:
             for group_idx in range(len(groups)):
+                ii = 0.0
+                jj = 0.0
                 for member in members[group_idx]:
+                    t00_binary = time.time()
                     member_idx = binary_search(member, data_header)
+                    t01_binary = time.time()
+                    ii = ii + 1
                     if member_idx != -1:
-                        group_counts[group_idx].append(int(A[member_idx]))
+                        jj = jj + 1
+                        t0_hash = time.time()
                         Table1.add(groups[group_idx],int(A[member_idx]))
+                        t1_hash = time.time()
             break
+    
+    binarytime = t01_binary - t00_binary
+    print("Binary Time")
+    print(binarytime*ii)
+    hashtime = t1_hash-t0_hash
+    print("Hash Time")
+    print(hashtime*jj)
     
     group_counts = [[] for i in range(len(groups))]
     i = 0
     for key in np.unique(Table1.keys):
         group_counts[i].append(Table1.search(key))
         i = i + 1
-        
-    print(Table1.search('Blood'))
 
     g = data_viz.boxplot(
         group_counts, sorted(nameset), group_col_name, gene_name, args.outfile)
-    
-def mainp():
-    """main function"""
-    data_file_name = args.gzfile
-    sample_info_file_name = args.txtfile
-    group_col_name = args.group_type
-    gene_name = args.gene
-
-    sample_id_col_name = 'SAMPID'
-
-    samples = []
-    sample_info_header = None
-    for l in open(sample_info_file_name):
-        if sample_info_header is None:
-            sample_info_header = l.rstrip().split('\t')
-        else:
-            samples.append(l.rstrip().split('\t'))
-
-    group_col_idx = linear_search(group_col_name, sample_info_header)
-    sample_id_col_idx = linear_search(sample_id_col_name, sample_info_header)
-
-    groups = []
-    members = []
-
-    names = []
-        
-    MemTable = ht.ChainedHash(30,hf.h_rolling)
-    for row_idx in range(len(samples)):
-        sample = samples[row_idx]
-        sample_name = sample[sample_id_col_idx]
-        curr_group = sample[group_col_idx]
-        names = names + [curr_group]
-
-        curr_group_idx = linear_search(curr_group, groups)
-
-        if curr_group_idx == -1:
-            curr_group_idx = len(groups)
-            groups.append(curr_group)
-            members.append([])
-        #print(sample_name)
-        MemTable.add(curr_group, sample_name)
-        members[curr_group_idx].append(sample_name)
-    
-    #print(MemTable.search('Blood'))
-    #print(members[0])
-    nameset = list(dict.fromkeys(names).keys())
-
-    version = None
-    dim = None
-    data_header = None
-
-    gene_name_col = 1
-
-    group_counts = [[] for i in range(len(groups))]
-
-    Table1 = ht.ChainedHash(len(nameset),hf.h_rolling)
-    for l in gzip.open(data_file_name, 'rt'):
-        if version is None:
-            version = l
-            continue
-
-        if dim is None:
-            dim = [int(x) for x in l.rstrip().split()]
-            continue
-
-        if data_header is None:
-            data_header = []
-            i = 0
-            for field in l.rstrip().split('\t'):
-                data_header.append([field, i])
-                i += 1
-            data_header.sort(key=lambda tup: tup[0])
-
-            continue
-
-        A = l.rstrip().split('\t')
-        #print(A)
-        
-        if A[gene_name_col] == gene_name:
-            for group_idx in range(len(groups)):
-                print(members[group_idx])               
-                for member in members[group_idx]:
-                    print(member)
-                    member_idx = binary_search(member, data_header)
-                    if member_idx != -1:
-                        group_counts[group_idx].append(int(A[member_idx]))
-                        Table1.add(groups[group_idx],int(A[member_idx]))
-            break
-            
-#             i = 0
-#             for key in np.unique(MemTable.keys):
-#                 # print(key)
-                
-#             print(MemTable.search('Vagina'))
-#             print(members[8])
-            
-#                 for num in MemTable.search(key):
-#                     print(num)
-#                    member_idx = binary_search(num, data_header)
-#                     if member_idx != -1:
-#                         group_counts[i].append(int(A[member_idx]))
-#                         Table1.add(key,int(A[member_idx]))
-#                         i = i + 1
-#            break
-                
-    
-#     L = []
-#     for key in np.unique(Table1.keys):
-#     #for key in groups:
-#         L.append(Table1.search(key))
-
-        
-#     g = data_viz.boxplot(
-#         group_counts, nameset, group_col_name, gene_name, args.outfile)
-#     #print(group_counts)
 
 
 if __name__ == '__main__':
