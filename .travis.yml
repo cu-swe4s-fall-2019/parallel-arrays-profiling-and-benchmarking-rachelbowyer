@@ -14,7 +14,8 @@ before_install:
     - conda install --yes matplotlib
       
 script:
-    - git submodule update --init --remote --recursive
+    - git clone https://github.com/cu-swe4s-fall-2019/hash-tables-rachelbowyer.git
+    - git submodule update --init
     - chmod +x test_plot_gtex.sh
     - ./test_plot_gtex.sh
     - python test_plot_gtex.py
